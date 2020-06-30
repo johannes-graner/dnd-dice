@@ -4,3 +4,4 @@ project/
 target/
 .bloop/
 .metals/
+src_old/
