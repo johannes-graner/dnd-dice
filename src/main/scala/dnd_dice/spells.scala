@@ -1,4 +1,4 @@
-package dnd_dice
+/* package dnd_dice
 import character._
 
 object spells {
@@ -58,4 +58,4 @@ object spells {
             adv
         )
     }
-}
+} */

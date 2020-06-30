@@ -16,8 +16,9 @@ object Main extends App {
 
   println(
     // testDist.getDensity.indices.map(k => testDist.getProb(k + testDist.start))
-    save_density(raym, orc, List(6), 0, false, "no")
+    save_density(raym, orc, List(6,6), 0, true, "no").getDensity.map(presentation.roundAt(4))
     // attack_density.map(presentation.roundAt(5))
+    // convolution(List(Die(6).distribution, Die(6).distribution))
 
     // List(1,2,3,4)
     // probability.percentile(0.95, probability.distrToDensity(probability.d20_distribution("no")))

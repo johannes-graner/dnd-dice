@@ -111,7 +111,7 @@ object probability {
     }
 
     def convolution_dam_dice(dam_dice: List[Int]): List[Double] = {
-        /* val first = List.fill( dam_dice.head )( 1/(dam_dice.head:Double) )
+        val first = List.fill( dam_dice.head )( 1/(dam_dice.head:Double) )
         if (dam_dice.length == 1)
             first
         else {
@@ -119,11 +119,11 @@ object probability {
             
             List.range[Int](0,first.length + recurse.length - 1)
                 .map(conv(_, first, recurse))
-        } */
-        convolution(dam_dice.map(d => List.fill(d)(1/(d: Double))))
+        }
+        // convolution(dam_dice.map(d => List.fill(d)(1/(d: Double))))
     }
 
-    def convolution(densities: List[List[Double]]): List[Double] = {
+    /* def convolution(densities: List[List[Double]]): List[Double] = {
         val first = densities.head
         if (densities.length == 1)
             first
@@ -132,6 +132,9 @@ object probability {
             List.range[Int](0,densities.head.length + recurse.length - 1)
                 .map(conv(_, first, recurse))
         }
+    } */
+    def convolution(densities: List[Distribution]): Distribution = {
+        densities.tail.fold(densities.head)(_.convolution(_))
     }
 
 
@@ -144,7 +147,7 @@ object probability {
         target: Target,
         dam_dice: List[Int],
         adv: String
-    ): List[Double] = {
+    ): Distribution = {
         val adjusted_ac: Int = target.ac - attacker.att_mod
         val d20_distr: List[Double] = d20_distribution(adv)
 
@@ -163,10 +166,11 @@ object probability {
                                          dam_density(dam_dice) ++
                                          List.fill(dam_dice.sum)(0.0)  */
 
-        d20_distr(adjusted_ac - 1) :: hit_dam
+        Distribution(d20_distr(adjusted_ac - 1) :: hit_dam
                                         .map(_*hit_prob)
                                         .zip(crit_dam.map(_*crit_prob))
                                         .map {case (x,y) => x + y}
+        )
     }
 
     def attackn_density(
@@ -175,7 +179,7 @@ object probability {
         target: Target,
         dam_dice: List[Int],
         adv: String
-    ): List[Double] = {
+    ): Distribution = {
         convolution(List.fill(nattacks)(attack_density(attacker,target,dam_dice,adv)))
     }
 
@@ -186,7 +190,7 @@ object probability {
         dam_mod: Int,
         half: Boolean,
         adv: String
-    ): List[Double] = {
+    ): Distribution = {
         val adjusted_dc = attacker.dc - target.save_mod
         val d20_distr: List[Double] = d20_distribution(adv)
 
@@ -206,9 +210,12 @@ object probability {
         val fail_prob: Double = 1 - save_prob
         val fail_dam: List[Double] = dam_distribution(dam_dice).getDensity
 
-        save_dam.map(_*save_prob)
-                .zip(fail_dam.map(_*fail_prob))
-                .map{ case (x,y) => x + y}
+        val raw_dens = save_dam.map(_*save_prob)
+                        .zip(fail_dam.map(_*fail_prob))
+                        .map{ case (x,y) => x + y}
+        val start = raw_dens.filter(_ == 0.0).length
+
+        Distribution(raw_dens.drop(start), start)
     }
 
     def expect(density: List[Double]): Double = {

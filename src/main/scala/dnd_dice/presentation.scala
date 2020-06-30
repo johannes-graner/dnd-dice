@@ -72,7 +72,7 @@ object presentation {
         def row(adv: String) = {
             println("-" * columns)
             // println(adv + " swift| " + damages(adv, spells.swiftness))
-            println(adv + " sharp| " + damages(adv, spells.sharpened_blade(4)))
+            // println(adv + " sharp| " + damages(adv, spells.sharpened_blade(4)))
             // println(   "   attack| " + damages(adv, spells.weapon_attack))
         }
 
