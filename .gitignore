@@ -2,3 +2,5 @@ build.sbt
 null/
 project/
 target/
+.bloop/
+.metals/
