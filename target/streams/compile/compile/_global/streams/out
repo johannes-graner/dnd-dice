@@ -1,0 +1,11 @@
+[0m[[0m[31merror[0m] [0m[0m/home/johannes/Documents/programming/just_for_fun/src/main/scala/dnd_dice/probability.scala:148:63: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m found   : Double[0m
+[0m[[0m[31merror[0m] [0m[0m required: Int[0m
+[0m[[0m[31merror[0m] [0m[0m        distr.foldRight(0){case (acc, x) => if (x < perc) acc + 1 else acc}[0m
+[0m[[0m[31merror[0m] [0m[0m                                                              ^[0m
+[0m[[0m[31merror[0m] [0m[0m/home/johannes/Documents/programming/just_for_fun/src/main/scala/dnd_dice/probability.scala:148:72: type mismatch;[0m
+[0m[[0m[31merror[0m] [0m[0m found   : Double[0m
+[0m[[0m[31merror[0m] [0m[0m required: Int[0m
+[0m[[0m[31merror[0m] [0m[0m        distr.foldRight(0){case (acc, x) => if (x < perc) acc + 1 else acc}[0m
+[0m[[0m[31merror[0m] [0m[0m                                                                       ^[0m
+[0m[[0m[31merror[0m] [0m[0mtwo errors found[0m

@@ -1,0 +1,4 @@
+[debug] [just_for_fun-test] Classpath dependencies List()
+[debug] [just_for_fun-test] Dependencies from configurations List(just_for_fun)
+[debug] Bloop wrote the configuration of project 'just_for_fun-test' to '/home/johannes/Documents/programming/just_for_fun/.bloop/just_for_fun-test.json'
+[success] Generated .bloop/just_for_fun-test.json
