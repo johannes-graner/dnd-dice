@@ -11,11 +11,13 @@ object Main extends App {
 
   val attack_density = probability.attack_density(raym,orc,raym.dam_dice,"no")
 
-  // presentation.run()
-  val testDist: Distribution = Distribution(List(0.2,0.4,0.4), start = 0)
+  presentation.run()
+  val testDist: Distribution = Distribution(List(0.2,0.4,0.4), start = -2)
 
   println(
-    testDist.variance
+    // testDist.getDensity.indices.map(k => testDist.getProb(k + testDist.start))
+    // save_density(raym, orc, List(6), 0, false, "no")
+    // attack_density.map(presentation.roundAt(4))
 
     // List(1,2,3,4)
     // probability.percentile(0.95, probability.distrToDensity(probability.d20_distribution("no")))
