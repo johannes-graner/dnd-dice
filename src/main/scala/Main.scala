@@ -2,6 +2,7 @@ object Main extends App {
   //euler.problem1.test()
   import dnd_dice._
   import dnd_dice.character._
+  import dnd_dice.probability._
 
   val cha = 5
   val prof = 3
@@ -10,9 +11,12 @@ object Main extends App {
 
   val attack_density = probability.attack_density(raym,orc,raym.dam_dice,"no")
 
-  presentation.run()
+  // presentation.run()
+  val testDist: Distribution = Distribution(List(0.2,0.4,0.4), start = 0)
 
   println(
+    testDist.variance
+
     // List(1,2,3,4)
     // probability.percentile(0.95, probability.distrToDensity(probability.d20_distribution("no")))
     // probability.save_density(raym,orc,List(6,6),0,true,"no")

@@ -3,6 +3,24 @@ package dnd_dice
 object probability {
     import character._
 
+    case class Distribution(
+        density: List[Double],
+        start: Int = 0
+    ) {
+        def checkDensity: Boolean = density.sum == 1.0 && density.map(_ >= 0).fold(true)(_ & _)
+        def distribution: List[Double] = density.scanLeft(0: Double)(_+_).tail
+        def moment(n: Int): Double = density.indices.map(k => math.pow(k + start,n)).zip(density).map{case (x,y) => x*y}.sum
+        def mean: Double = moment(1)
+        def variance: Double = moment(2) - math.pow(mean,2)
+        def getProb(k: Int): Double = {
+            val adj_k = k - start
+            if (adj_k < 0 || adj_k >= density.length)
+                0
+            else
+                density(adj_k)
+        }
+    }
+
     def d20_hit_prob(ac: Int, adv: String): Double = {
         if (adv == "dis") 
             (math pow ((21 - ac)/(20: Double), 2))
