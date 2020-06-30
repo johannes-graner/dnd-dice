@@ -149,15 +149,19 @@ object probability {
         val d20_distr: List[Double] = d20_distribution(adv)
 
         val crit_prob: Double = 1 - d20_distr(20 - attacker.crits.length)
-        val crit_dam: List[Double] = //dam_distribution(dam_dice ++ dam_dice).addStart(attacker.dam_mod).getDensity
-                                     List.fill(attacker.dam_mod)(0.0) ++ 
-                                        dam_density(dam_dice ++ dam_dice) 
+        val crit_dam: List[Double] = dam_distribution(dam_dice ++ dam_dice)
+                                        .addStart(attacker.dam_mod - 1)
+                                        .getDensity
+                                    /* List.fill(attacker.dam_mod)(0.0) ++ 
+                                        dam_density(dam_dice ++ dam_dice) */ 
 
         val hit_prob: Double =  1 - d20_distr(adjusted_ac - 1) - crit_prob
-        val hit_dam: List[Double] = //dam_distribution(dam_dice).addStart(attacker.dam_mod).getDensity ++ List.fill(dam_dice.sum)(0.0)
-                                     List.fill(attacker.dam_mod)(0.0) ++ 
-                                        dam_density(dam_dice) ++
-                                        List.fill(dam_dice.sum)(0.0) 
+        val hit_dam: List[Double] = dam_distribution(dam_dice)
+                                        .addStart(attacker.dam_mod - 1)
+                                        .getDensity ++ List.fill(dam_dice.sum)(0.0)
+                                    /* List.fill(attacker.dam_mod)(0.0) ++ 
+                                         dam_density(dam_dice) ++
+                                         List.fill(dam_dice.sum)(0.0)  */
 
         d20_distr(adjusted_ac - 1) :: hit_dam
                                         .map(_*hit_prob)
