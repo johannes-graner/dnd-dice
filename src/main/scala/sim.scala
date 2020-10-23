@@ -1,3 +1,4 @@
+/*
 package dnd_dice
 import character._
 
@@ -17,3 +18,4 @@ object sim {
         ) / (n: Double)
     }
 }
+*/

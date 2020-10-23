@@ -1,72 +1,12 @@
 package dnd_dice
 
 import scala.annotation.switch
+import scalaprob.probability._
+import spire.math._
 
 object probability {
-    import character._
 
-    case class Distribution(
-        private val density: List[Double],
-        start: Int = 0
-    ) {
-        def getDensity: List[Double] = {
-            // If start < 0, list is padded with -start zeros on the right.
-            if (start < 0) 
-                density ++ List.fill(-start)(0.0)
-            else
-                List.fill(start)(0.0) ++ density
-        }
-
-        def addStart(mod: Int): Distribution = copy(start = start + mod)
-
-        def checkDensity: Boolean = density.sum == 1.0 && density.map(_ >= 0).fold(true)(_ & _)
-        def distribution: List[Double] = density.scanLeft(0: Double)(_+_).tail
-        def moment(n: Int): Double = density.indices.map(k => math.pow(k + start,n)).zip(density).map{case (x,y) => x*y}.sum
-        def mean: Double = moment(1)
-        def variance: Double = moment(2) - math.pow(mean,2)
-
-
-        def getProb(k: Int): Double = {
-            val adj_k = k - start
-            if (adj_k < 0 || adj_k >= density.length)
-                0
-            else
-                density(adj_k)
-        }
-
-        def convolution(other: Distribution): Distribution = {
-            var this_dens: List[Double] = List.empty
-            var other_dens: List[Double] = List.empty
-            if (start >= 0) {
-                if (other.start >= 0) {
-                    this_dens = getDensity
-                    other_dens = other.getDensity
-                } else {
-                    this_dens = List.fill(-other.start)(0.0) ++ getDensity
-                    other_dens = other.density
-                }
-            } else {
-                if (other.start >= 0) {
-                    this_dens = density
-                    other_dens = List.fill(-start)(0.0) ++ density
-                } else {
-                    this_dens = List.fill(-other.start)(0.0) ++ getDensity
-                    other_dens = List.fill(-start)(0.0) ++ density
-                }
-            }
-
-            Distribution(
-                List.range[Int](0,this_dens.length + other_dens.length - 1)
-                    .map(conv(_, this_dens, other_dens)).drop(start + other.start),
-                start + other.start
-            )
-        }
-    }
-
-    case class Die(size: Int) {
-        def distribution: Distribution = Distribution(List.fill(size)(1/(size: Double)), 1)
-    }
-
+  /*
     private def conv(x: Int, L1: List[Double], L2: List[Double]): Double = {
         var res: Double = 0
         if (L1.length < L2.length) {
@@ -82,7 +22,7 @@ object probability {
     }
 
     private def d20_hit_prob(ac: Int, adv: String): Double = {
-        if (adv == "dis") 
+        if (adv == "dis")
             (math pow ((21 - ac)/(20: Double), 2))
         else {
             val exp = adv match {
@@ -116,7 +56,7 @@ object probability {
             first
         else {
             val recurse = convolution_dam_dice(dam_dice.tail)
-            
+
             List.range[Int](0,first.length + recurse.length - 1)
                 .map(conv(_, first, recurse))
         }
@@ -155,14 +95,14 @@ object probability {
         val crit_dam: List[Double] = dam_distribution(dam_dice ++ dam_dice)
                                         .addStart(attacker.dam_mod - 1)
                                         .getDensity
-                                    /* List.fill(attacker.dam_mod)(0.0) ++ 
-                                        dam_density(dam_dice ++ dam_dice) */ 
+                                    /* List.fill(attacker.dam_mod)(0.0) ++
+                                        dam_density(dam_dice ++ dam_dice) */
 
         val hit_prob: Double =  1 - d20_distr(adjusted_ac - 1) - crit_prob
         val hit_dam: List[Double] = dam_distribution(dam_dice)
                                         .addStart(attacker.dam_mod - 1)
                                         .getDensity ++ List.fill(dam_dice.sum)(0.0)
-                                    /* List.fill(attacker.dam_mod)(0.0) ++ 
+                                    /* List.fill(attacker.dam_mod)(0.0) ++
                                          dam_density(dam_dice) ++
                                          List.fill(dam_dice.sum)(0.0)  */
 
@@ -228,4 +168,5 @@ object probability {
         val distr = density.scanLeft(0.0)(_+_).tail.map(presentation.roundAt(5))
         distr.foldLeft(0){case (acc, x) => if (x < perc) acc + 1 else acc}
     }
+   */
 }
