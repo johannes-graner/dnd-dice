@@ -79,7 +79,11 @@ object dice {
     }
 
     val finalDensity =
-      keys.map(k => (k, densities.map(_.getOrElse(k, Rational.zero)).sum)).toMap
+      keys
+        .map(k => (k, densities.map(_.getOrElse(k, Rational.zero)).sum))
+        .map{ pk => if (pk._1 < 0) (0,pk._2) else pk }
+        .groupBy(_._1).mapValues(_.map(_._2).sum)
+        .toMap
 
     DiscreteProb(finalDensity)
   }

@@ -26,8 +26,6 @@ class DiscreteTest extends org.scalatest.funsuite.AnyFunSuite {
     val attack = dice.attack(att, target, dam_dice, d20Dist)
     val attack2 = dice.attackN(2, att,target,dam_dice,d20Dist)
 
-    println(attack)
-    //println(attack2)
     assert(attack.checkDensity)
     assert(attack2.checkDensity)
     assert(attack2.getProb(1) == 0)
