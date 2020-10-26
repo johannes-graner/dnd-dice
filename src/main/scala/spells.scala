@@ -1,5 +1,6 @@
-/* package dnd_dice
-import character._
+/*package dnd_dice
+
+import scalaprob.probability._
 
 object spells {
     def swiftness(
@@ -58,4 +59,4 @@ object spells {
             adv
         )
     }
-} */
+}*/

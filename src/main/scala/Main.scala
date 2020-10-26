@@ -7,7 +7,7 @@ object Main extends App {
   //euler.problem1.test()
 
   val cha = 5
-  val prof = 3
+  val prof = 4
   val raym =
     Attacker(cha + prof, List(8), cha, List(20), 8 + cha + prof, "Raym")
   val orc = Target(12, 3)
