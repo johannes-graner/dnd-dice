@@ -3,6 +3,7 @@ package dnd_dice
 import scalaprob.probability._
 
 object spells {
+
   def swiftness(
       attacker: Attacker,
       target: Target,
@@ -35,15 +36,12 @@ object spells {
       target: Target,
       adv: DiscreteProb
   ): DiscreteProb = {
-    if (level < 2)
-      sharpened_blade(2)(attacker, target, adv)
-    else
-      dice.attack(
-        attacker,
-        target,
-        attacker.dam_dice ++ List.fill(level + 1)(10),
-        adv
-      )
+    dice.attack(
+      attacker,
+      target,
+      attacker.dam_dice ++ List.fill(1 + math.max(level, 2))(10),
+      adv
+    )
   }
 
   def steel_wind_strike(
@@ -55,6 +53,21 @@ object spells {
       attacker.copy(dam_mod = 0),
       target,
       List.fill(5)(10),
+      adv
+    )
+  }
+
+  def fireball(level: Int = 3)(
+    attacker: Attacker,
+    target: Target,
+    adv: DiscreteProb
+  ): DiscreteProb = {
+    dice.save(
+      attacker,
+      target,
+      List.fill(5 + math.max(level,3))(6),
+      0,
+      true,
       adv
     )
   }

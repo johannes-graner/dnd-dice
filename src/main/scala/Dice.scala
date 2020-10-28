@@ -47,17 +47,25 @@ object dice {
       attacker: Attacker,
       target: Target,
       dam_dice: List[Int],
-      d20Dist: DiscreteProb
+      d20Dist: DiscreteProb,
+      dam_mult: Rational = 1
   ): DiscreteProb = {
 
-    val deMoivreDice = dam_dice.map(DeMoivre(_))
+    if (dam_mult == Rational.zero) {
+      return OnePoint(0).toDiscreteProb
+    }
+
+    val deMoivreDice = dam_dice.map(DeMoivre(_).toDiscreteProb)
     val effectiveAC = target.ac - attacker.att_mod
 
-    val critProb: Rational = attacker.crits.map(d20Dist.getProb(_)).sum
+    val critProb: Rational =
+      d20Dist.getProb(
+        attacker.crits.toSet
+      ) // attacker.crits.map(d20Dist.getProb(_)).sum
     val critDam: DiscreteProb = {
       val dice = deMoivreDice ++ deMoivreDice
-      dice.tail
-        .foldLeft(dice.head.toDiscreteProb)(_.convolution(_))
+      dice
+        .reduce(_.convolution(_))
         .shift(attacker.dam_mod)
     }
     val critDens: Map[Int, Rational] =
@@ -67,8 +75,8 @@ object dice {
     val missDens: Map[Int, Rational] = Map((0, missProb))
 
     val hitProb: Rational = 1 - critProb - missProb
-    val hitDam: DiscreteProb = deMoivreDice.tail
-      .foldLeft(deMoivreDice.head.toDiscreteProb)(_.convolution(_))
+    val hitDam: DiscreteProb = deMoivreDice
+      .reduce(_.convolution(_))
       .shift(attacker.dam_mod)
     val hitDens: Map[Int, Rational] =
       hitDam.density.mapValues(_ * hitProb).toMap
@@ -81,9 +89,11 @@ object dice {
     val finalDensity =
       keys
         .map(k => (k, densities.map(_.getOrElse(k, Rational.zero)).sum))
-        .map{ pk => if (pk._1 < 0) (0,pk._2) else pk }
-        .groupBy(_._1).mapValues(_.map(_._2).sum)
+        .map(pk => (if (pk._1 < 0) (0, pk._2) else pk))
+        .groupBy(_._1)
+        .mapValues(_.map(_._2).sum)
         .toMap
+        .groupMapReduce(pair => (pair._1 * dam_mult).intValue)(_._2)(_ + _)
 
     DiscreteProb(finalDensity)
   }
@@ -93,10 +103,61 @@ object dice {
       attacker: Attacker,
       target: Target,
       dam_dice: List[Int],
-      d20Dist: DiscreteProb
+      d20Dist: DiscreteProb,
+      dam_mult: Rational = 1
   ): DiscreteProb = {
-    val attacks = List.fill(n)(attack(attacker, target, dam_dice, d20Dist))
-    attacks.tail.foldLeft(attacks.head)(_.convolution(_))
+    val attacks =
+      List.fill(n)(attack(attacker, target, dam_dice, d20Dist, dam_mult))
+    attacks.reduce(
+      _.convolution(_)
+    ) //tail.foldLeft(attacks.head)(_.convolution(_))
+  }
+
+  def save(
+      attacker: Attacker,
+      target: Target,
+      dam_dice: List[Int],
+      dam_mod: Int,
+      half: Boolean,
+      d20Dist: DiscreteProb,
+      dam_mult: Rational = 1
+  ): DiscreteProb = {
+
+    if (dam_mult == Rational.zero) return OnePoint(0).toDiscreteProb
+
+    val effectiveDC = attacker.dc - target.save_mod
+
+    val save_dam_mult = if (half) Rational(1, 2) else Rational.zero
+
+    val failProb = d20Dist.getProb((1 to effectiveDC).toSet)
+    val fail_dam_dens =
+      dam_dice
+        .map(DeMoivre(_).toDiscreteProb)
+        .reduce(_.convolution(_))
+        .shift(dam_mod)
+        .density
+
+    val saveProb = 1 - failProb
+    val save_dam_dens =
+      if (save_dam_mult == 0) {
+        Map(0 -> Rational.one)
+      } else {
+        fail_dam_dens
+          .groupMapReduce(pair => (pair._1 * save_dam_mult).intValue)(_._2)(_ + _)
+      }
+
+    val final_dam_dens = fail_dam_dens.keySet
+      .union(save_dam_dens.keySet)
+      .map { k =>
+        (
+          k,
+          fail_dam_dens.getOrElse(k, Rational.zero) * failProb +
+            save_dam_dens.getOrElse(k, Rational.zero) * saveProb
+        )
+      }
+      .toMap
+      .groupMapReduce(pair => (pair._1 * dam_mult).intValue)(_._2)(_ + _)
+    DiscreteProb(final_dam_dens)
   }
 
   /*

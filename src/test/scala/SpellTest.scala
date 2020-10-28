@@ -10,7 +10,7 @@ class SpellTest extends org.scalatest.funsuite.AnyFunSuite {
     dam_dice = List(6),
     dam_mod = 2,
     crits = List(20),
-    dc = 20
+    dc = 16
   )
   val weakAtt = strongAtt.copy(dam_mod = -2)
 
@@ -57,6 +57,15 @@ class SpellTest extends org.scalatest.funsuite.AnyFunSuite {
     assert(spell2.checkDensity)
     assert(spell3.checkDensity)
     assert(spell2.density.keys.max == spell3.density.keys.max - 2*10)
+  }
+
+  test("Fireball") {
+    val spell3 = spells.fireball(3)(strongAtt,target,dice.d20)
+    val spell4 = spells.fireball(4)(strongAtt,target,dice.d20)
+
+    assert(spell3.checkDensity)
+    assert(spell4.checkDensity)
+    assert(spell3.density.keys.max == spell4.density.keys.max - 6)
   }
 
 }
