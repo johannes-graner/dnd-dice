@@ -9,11 +9,17 @@ data Dice = Dice {
   probs  :: [Double]
 }
 
+-- Not point-free, but only used for display.
 instance Show Dice where
   show (Dice offset maxValue probs) = show offset ++ ", " ++ show maxValue ++ ", " ++ show probs
 
+-- zipWithIndex with offset index
 offsetIndex :: Int -> [b] -> [(Int, b)]
-offsetIndex offset = zip [offset..]
+offsetIndex =
+  let
+    offsetList = flip map [0..] . (+)
+  in
+    zip . offsetList
 
 -- fma a (b,c) = a + b*c
 fma :: (Int, Double) -> Double -> Double
@@ -23,7 +29,6 @@ valueProb :: Dice -> [(Int, Double)]
 valueProb = offsetIndex . offset <*> probs
 
 -- Using <*>  (S comb) to apply argument to both replicate and fromIntegral.
--- Using join (W comb) to apply argument twice.
 makeDie :: Int -> Dice
 makeDie =
   let
