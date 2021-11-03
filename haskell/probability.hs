@@ -44,11 +44,19 @@ convSingle d1 d2 n
       convSingle d1 d2 m
   | otherwise =
     let
-      maxIndex = n - offset d1 - offset d2
-      probs1 = take (maxIndex+1) $ probs d1
-      probs2 = take (maxIndex+1) $ probs d2
+      offsetPair = curry $ join (***) offset
+      maximumIndex :: Dice -> Dice -> Int -> Int
+      maximumIndex = curry $ subtract . uncurry (+) . uncurry offsetPair
+      --maxIndex = 1 + n - offset d1 - offset d2
+      maxIndex = 1 + maximumIndex d1 d2 n
+      relevantProbs = flip $ flip take . probs
+      relProbs = relevantProbs maxIndex
+
+      -- sumList is list to sum in convolution
+      partial = flip $ zipWith (*) . relProbs 
+      sumList = partial . reverse . relProbs
     in
-      sum $ zipWith (*) probs1 $ reverse probs2
+      sum $ sumList d1 d2
 
 convolution :: Dice -> Dice -> Dice
 convolution =
