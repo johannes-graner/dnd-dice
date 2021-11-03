@@ -16,9 +16,7 @@ instance Show Dice where
 -- zipWithIndex with offset index
 offsetIndex :: Int -> [b] -> [(Int, b)]
 offsetIndex =
-  let
-    offsetList = flip map [0..] . (+)
-  in
+  let offsetList = flip map [0..] . (+) in
     zip . offsetList
 
 -- fma a (b,c) = a + b*c
